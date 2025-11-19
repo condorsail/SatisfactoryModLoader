@@ -41,7 +41,10 @@ void ASessionSettingsSubsystem::OnSessionSettingUpdated(const FString StrID, FVa
 		// We're a client, so we only have our own player controller
 		AFGPlayerController* PlayerController = Cast<AFGPlayerController>(GetWorld()->GetFirstPlayerController());
 		USMLSessionSettingsRemoteCallObject* RCO = PlayerController->GetRemoteCallObjectOfClass<USMLSessionSettingsRemoteCallObject>();
-		RCO->Server_RequestSessionSettingUpdate(StrID, USessionSettingsManager::VariantToString(value));
+		// Safety check: RCO may not exist for vanilla clients
+		if (RCO) {
+			RCO->Server_RequestSessionSettingUpdate(StrID, USessionSettingsManager::VariantToString(value));
+		}
 	}
 }
 
