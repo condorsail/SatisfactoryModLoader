@@ -146,9 +146,8 @@ void FSMLNetworkManager::ValidateSMLConnectionData(UNetConnection* Connection, b
 	const FConnectionMetadata SMLMetadata = GModConnectionMetadata.GetAnnotation( Connection );
     TArray<FString> RemoteMissingMods;
     
-    if (!SMLMetadata.bIsInitialized && !bAllowMissingMods && IsServer ) {
-		// TODO: Is joining a modded server with a vanilla client safe?
-        UModNetworkHandler::CloseWithFailureMessage(Connection, TEXT("This server is running Satisfactory Mod Loader, and your client doesn't have it installed."));
+    if (!SMLMetadata.bIsInitialized && IsServer ) {
+		// Vanilla client mode: Allow vanilla clients to connect to modded servers
         return;
     }
 
