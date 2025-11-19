@@ -69,11 +69,16 @@ void FSMLNetworkManager::HandleGameModePostLogin(AGameModeBase* GameMode, APlaye
     if (AFGPlayerController* CastedPlayerController = Cast<AFGPlayerController>(Controller)) {
         USMLRemoteCallObject* RemoteCallObject = CastedPlayerController->GetRemoteCallObjectOfClass<USMLRemoteCallObject>();
 
+        // Safety check: RemoteCallObject should always exist, but guard against edge cases
+        if (!RemoteCallObject) {
+            return;
+        }
+
         if (CastedPlayerController->IsLocalController()) {
             //This is a local player, so installed mods are our local mod list
             UModLoadingLibrary* ModLoadingLibrary = GameMode->GetGameInstance()->GetSubsystem<UModLoadingLibrary>();
             const TArray<FModInfo> Mods = ModLoadingLibrary->GetLoadedMods();
-            
+
             for (const FModInfo& ModInfo : Mods) {
                 RemoteCallObject->ClientInstalledMods.Add(ModInfo.Name, ModInfo.Version);
             }
@@ -81,7 +86,7 @@ void FSMLNetworkManager::HandleGameModePostLogin(AGameModeBase* GameMode, APlaye
             //This is remote player, retrieve installed mods from connection
             const UNetConnection* NetConnection = CastChecked<UNetConnection>(Controller->Player);
         	const FConnectionMetadata ConnectionMetadata = GModConnectionMetadata.GetAndRemoveAnnotation( NetConnection );
-        	
+
             RemoteCallObject->ClientInstalledMods.Append(ConnectionMetadata.InstalledRemoteMods);
         }
     }
